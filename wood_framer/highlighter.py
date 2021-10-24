@@ -29,8 +29,6 @@ class Highlighter(DirectObject):
         self.accept("mouse1", self._precheck_mouse)
         self.accept("mouse1-up", self._handle_mouse_click)
 
-        self.accept("shift-mouse1", self._precheck_mouse)
-
     def update(self):
         source, target = self._extrude_mouse_to_render_transform()
         if source is None:
