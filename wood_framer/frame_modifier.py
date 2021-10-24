@@ -36,18 +36,37 @@ class FrameModifier(DirectObject):
         self.accept("+", self._increase_length)
         self.accept("+-repeat", self._increase_length)
 
-        self.accept("arrow_left", self._decrease_rotation)
-        self.accept("arrow_left-repeat", self._decrease_rotation)
-        self.accept("arrow_right", self._increase_rotation)
-        self.accept("arrow_right-repeat", self._increase_rotation)
+        self.accept("arrow_left", self._decrease_heading)
+        self.accept("arrow_left-repeat", self._decrease_heading)
+        self.accept("arrow_right", self._increase_heading)
+        self.accept("arrow_right-repeat", self._increase_heading)
 
-    def _decrease_rotation(self):
-        self._change_rotation(-45)
+        self.accept("arrow_down", self._decrease_pitch)
+        self.accept("arrow_down-repeat", self._decrease_pitch)
+        self.accept("arrow_up", self._increase_pitch)
+        self.accept("arrow_up-repeat", self._increase_pitch)
 
-    def _increase_rotation(self):
-        self._change_rotation(45)
+    def _decrease_pitch(self):
+        self._change_pitch(-15)
 
-    def _change_rotation(self, amount: float):
+    def _increase_pitch(self):
+        self._change_pitch(15)
+
+    def _change_pitch(self, amount: float):
+        if self._highligher.selected_frame is None:
+            return
+
+        frame = self._highligher.selected_frame
+        rotation = frame.get_rotation()
+        frame.set_rotation(rotation + core.Vec3(0, amount, 0))
+
+    def _decrease_heading(self):
+        self._change_heading(-45)
+
+    def _increase_heading(self):
+        self._change_heading(45)
+
+    def _change_heading(self, amount: float):
         if self._highligher.selected_frame is None:
             return
 
