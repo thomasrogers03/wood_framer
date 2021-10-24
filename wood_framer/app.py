@@ -3,7 +3,9 @@ import typing
 import uuid
 
 from direct.showbase.ShowBase import ShowBase
-from panda3d import core, bullet
+from panda3d import bullet, core
+
+from . import frame
 
 
 class App(ShowBase):
@@ -13,7 +15,6 @@ class App(ShowBase):
     _EIGHT_FEET = 8 * _INCHES_TO_FEET
     _TEN_FEET = 10 * _INCHES_TO_FEET
     _TWELVE_FEET = 12 * _INCHES_TO_FEET
-    _SPACE_BETWEEN_STUDS = 16
 
     def __init__(self):
         super().__init__()
@@ -56,11 +57,9 @@ class App(ShowBase):
         self._two_by_six.set_scale(2, 6, 1)
         self._two_by_six.hide()
 
-        self._frame: typing.List[core.NodePath] = []
-
         frame_base.remove_node()
 
-        self._build_wall_frame(self._TEN_FEET, self._EIGHT_FEET)
+        self._build_wall_frame(self._TWELVE_FEET, self._EIGHT_FEET)
 
         self.task_mgr.add(self._update)
 
@@ -80,40 +79,10 @@ class App(ShowBase):
         self._collision_world.set_debug_node(debug_node)
 
     def _build_wall_frame(self, length: float, height: float):
-        frame_id = uuid.uuid4()
-
-        frame_boundry_shape = bullet.BulletBoxShape(
-            core.Vec3(length / 2, 2, height / 2)
+        display = frame.FrameDisplay(
+            self._scene, self._collision_world, length, height, self._new_two_by_four
         )
-        frame_boundry_node = bullet.BulletRigidBodyNode(f"frame-{frame_id}")
-        frame_boundry_node.add_shape(
-            frame_boundry_shape,
-            core.TransformState.make_pos(core.Vec3(length / 2, 0, height / 2)),
-        )
-        frame_boundry_node.set_kinematic(True)
-        frame_boundry_node.set_mass(0)
-
-        self._collision_world.attach(frame_boundry_node)
-        frame_boundry: core.NodePath = self._scene.attach_new_node(frame_boundry_node)
-
-        bottom = self._new_two_by_four(frame_boundry, length)
-        bottom.set_r(90)
-        bottom.set_z(1)
-
-        top = self._new_two_by_four(frame_boundry, length)
-        top.set_r(90)
-        top.set_z(height - 1)
-
-        stud_count = int(length / self._SPACE_BETWEEN_STUDS)
-        for stud_index in range(stud_count + 1):
-            stud = self._new_two_by_four(frame_boundry, height - 4)
-            stud.set_z(2)
-            stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS + 1)
-
-        if stud_count * self._SPACE_BETWEEN_STUDS < length:
-            stud = self._new_two_by_four(frame_boundry, height - 4)
-            stud.set_z(2)
-            stud.set_x(length - 1)
+        return frame.Frame(display)
 
     def _new_two_by_four(self, parent: core.NodePath, length: float):
         result = self._new_frame_piece(parent)
