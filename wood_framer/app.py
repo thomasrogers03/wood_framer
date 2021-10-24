@@ -1,4 +1,6 @@
+import json
 import os.path
+import typing
 import uuid
 
 from direct.showbase.ShowBase import ShowBase
@@ -15,6 +17,7 @@ class App(ShowBase):
     _TEN_FEET = 10 * _INCHES_TO_FEET
     _TWELVE_FEET = 12 * _INCHES_TO_FEET
     _TICK_RATE = 1 / 35
+    _PROJECT_PATH = "project.json"
 
     def __init__(self):
         super().__init__()
@@ -78,6 +81,42 @@ class App(ShowBase):
 
         self.accept("shift-a", self._add_frame)
         self.accept("shift-d", self._copy_frame)
+        self.accept("shift-s", self._save_work)
+
+        self._load_work()
+
+    def _load_work(self):
+        if not os.path.isfile(self._PROJECT_PATH):
+            return
+
+        with open(self._PROJECT_PATH, "r") as file:
+            result: typing.List[typing.Dict[str, float]] = json.load(file)
+
+        for details in result:
+            new_frame = self._build_wall_frame(details["length"], details["height"])
+            new_frame.set_position(details["x"], details["y"], details["z"])
+            new_frame.set_rotation(details["h"], details["p"], details["r"])
+
+    def _save_work(self):
+        result: typing.List[typing.Dict[str, float]] = []
+        for path in self._scene.find_all_matches("frame-*"):
+            frame_to_save = frame.Frame.frame_from_node_path(path)
+            position = frame_to_save.get_position()
+            rotation = frame_to_save.get_rotation()
+            details = {
+                "length": frame_to_save.length,
+                "height": frame_to_save.height,
+                "x": position.x,
+                "y": position.y,
+                "z": position.z,
+                "h": rotation.x,
+                "p": rotation.y,
+                "r": rotation.z,
+            }
+            result.append(details)
+
+        with open(self._PROJECT_PATH, "w+") as file:
+            json.dump(result, file)
 
     def _add_frame(self):
         self._build_wall_frame(32, self._EIGHT_FEET)
@@ -86,10 +125,10 @@ class App(ShowBase):
         if self._highlighter.selected_frame is None:
             return
 
-        frame = self._highlighter.selected_frame
-        new_frame = self._build_wall_frame(frame.length, frame.height)
-        new_frame.set_position(frame.get_position())
-        new_frame.set_rotation(frame.get_rotation())
+        old_frame = self._highlighter.selected_frame
+        new_frame = self._build_wall_frame(old_frame.length, old_frame.height)
+        new_frame.set_position(old_frame.get_position())
+        new_frame.set_rotation(old_frame.get_rotation())
 
     def _re_enable_mouse(self):
         camera: core.NodePath = self.camera

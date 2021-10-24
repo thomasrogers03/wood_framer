@@ -62,6 +62,8 @@ class Frame:
 
         frame_id = uuid.uuid4()
         self._display_parent: core.NodePath = scene.attach_new_node(f"frame-{frame_id}")
+        self._display_parent.set_python_tag("frame", self)
+
         self.get_position = self._display_parent.get_pos
         self.set_position = self._display_parent.set_pos
         self.get_rotation = self._display_parent.get_hpr
@@ -84,6 +86,10 @@ class Frame:
 
         self._frame_display: typing.Optional[FrameDisplay] = None
         self.update(self._length, self._height)
+
+    @staticmethod
+    def frame_from_node_path(path: core.NodePath):
+        return typing.cast(Frame, path.get_python_tag("frame"))
 
     @staticmethod
     def frame_from_node(node: bullet.BulletBodyNode):
