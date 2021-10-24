@@ -60,7 +60,9 @@ class App(ShowBase):
         frame_base.remove_node()
 
         frame = self._build_wall_frame(self._TWELVE_FEET, self._EIGHT_FEET)
-        frame.update(24, 64)
+        frame = self._build_wall_frame(self._SIX_FEET, self._EIGHT_FEET)
+        frame.set_rotation(-90, 0, 0)
+        frame.set_position(self._TWELVE_FEET - 2, -2, 0)
 
         self.task_mgr.add(self._update)
 

@@ -16,6 +16,8 @@ class FrameDisplay:
     ):
         self._frame: core.NodePath = display_parent.attach_new_node("frame")
         self.destroy = self._frame.remove_node
+        self.set_position = self._frame.set_pos
+        self.set_rotation = self._frame.set_hpr
 
         bottom = make_two_by_four(self._frame, length)
         bottom.set_r(90)
@@ -51,7 +53,9 @@ class Frame:
         self._make_two_by_four = make_two_by_four
 
         frame_id = uuid.uuid4()
-        self._display_parent = scene.attach_new_node(f"frame-{frame_id}")
+        self._display_parent: core.NodePath = scene.attach_new_node(f"frame-{frame_id}")
+        self.set_position = self._display_parent.set_pos
+        self.set_rotation = self._display_parent.set_hpr
 
         frame_boundry_shape = bullet.BulletBoxShape(core.Vec3(0.5, 0.5, 0.5))
         frame_boundry_node = bullet.BulletRigidBodyNode(f"frame-{frame_id}")
