@@ -30,7 +30,7 @@ class FrameDisplay:
         bottom = make_two_by_four(self._frame, length)
         bottom.set_r(90)
         bottom.set_z(1)
-        self._make_label(display_parent, bottom, f"length: {length}")
+        self._make_label(display_parent, bottom, self._length_message(length))
 
         top = make_two_by_four(self._frame, length)
         top.set_r(90)
@@ -44,24 +44,29 @@ class FrameDisplay:
             stud = make_two_by_four(self._frame, wall_stud_length)
             stud.set_z(2)
             stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS + 1)
-            self._make_label(display_parent, stud, self._length_message(wall_stud_length))
+            self._make_label(
+                display_parent, stud, self._length_message(wall_stud_length)
+            )
 
         if stud_count * self._SPACE_BETWEEN_STUDS <= length:
             stud = make_two_by_four(self._frame, wall_stud_length)
             stud.set_z(2)
             stud.set_x(length - 1)
-            self._make_label(display_parent, stud, self._length_message(wall_stud_length))
+            self._make_label(
+                display_parent, stud, self._length_message(wall_stud_length)
+            )
 
     @staticmethod
     def _length_message(inches: float):
         feet = 0
-        while inches > FrameDisplay._INCHES_TO_FEET:
+        while inches >= FrameDisplay._INCHES_TO_FEET:
             feet += 1
             inches -= FrameDisplay._INCHES_TO_FEET
         message = "length: "
         if feet > 0:
             message += f"{feet}'"
-        message += f'{inches}"'
+        if inches > 0:
+            message += f'{inches}"'
         return message
 
     @staticmethod
@@ -74,11 +79,12 @@ class FrameDisplay:
         text_node.set_card_color(1, 1, 1, 1)
 
         result: core.NodePath = parent.attach_new_node(text_node)
+        result.set_pos(2, -4, 0.5)
+        result.set_hpr(0, 0, -90)
         result.set_scale(scene, core.Vec3(1, 1, 1))
-        result.set_hpr(scene, core.Vec3(0, 0, 0))
-        result.set_pos(1, 0, 0.5)
         result.set_two_sided(True)
-        result.set_depth_offset(1, 1)
+
+        return result
 
 
 class Frame:
@@ -96,9 +102,7 @@ class Frame:
         self._highlight = FrameHighlight.none
 
         frame_id = uuid.uuid4()
-        self._display_parent: core.NodePath = scene.attach_new_node(
-            f"frame-{frame_id}"
-        )
+        self._display_parent: core.NodePath = scene.attach_new_node(f"frame-{frame_id}")
         self._display_parent.set_python_tag("frame", self)
 
         self.get_position = self._display_parent.get_pos
