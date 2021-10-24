@@ -8,7 +8,7 @@ from . import highlighter
 
 
 class FrameModifier(DirectObject):
-    _TRANSFORM_SCALE = 20
+    _TRANSFORM_SCALE = 50
 
     def __init__(
         self,

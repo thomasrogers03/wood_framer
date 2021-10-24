@@ -59,11 +59,6 @@ class App(ShowBase):
 
         frame_base.remove_node()
 
-        frame = self._build_wall_frame(self._TWELVE_FEET, self._EIGHT_FEET)
-        frame = self._build_wall_frame(self._SIX_FEET, self._EIGHT_FEET)
-        frame.set_rotation(-90, 0, 0)
-        frame.set_position(self._TWELVE_FEET - 2, -2, 0)
-
         self._highlighter = highlighter.Highlighter(
             self.render,
             self.mouseWatcherNode,
@@ -80,6 +75,21 @@ class App(ShowBase):
         )
 
         self.task_mgr.do_method_later(self._TICK_RATE, self._tick, "tick")
+
+        self.accept("shift-a", self._add_frame)
+        self.accept("shift-d", self._copy_frame)
+
+    def _add_frame(self):
+        self._build_wall_frame(32, self._EIGHT_FEET)
+
+    def _copy_frame(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame = self._highlighter.selected_frame
+        new_frame = self._build_wall_frame(frame.length, frame.height)
+        new_frame.set_position(frame.get_position())
+        new_frame.set_rotation(frame.get_rotation())
 
     def _re_enable_mouse(self):
         camera: core.NodePath = self.camera
