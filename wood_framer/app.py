@@ -38,29 +38,18 @@ class App(ShowBase):
         self._scene: core.NodePath = self.render.attach_new_node("scene")
         self._scene.set_scale(self._METRES_TO_INCHES)
 
-        frame_base: core.NodePath = self._scene.attach_new_node("frame_base")
+        self._frame_base: core.NodePath = self._scene.attach_new_node("frame_base")
         box: core.NodePath = self.loader.load_model("box")
-        box.reparent_to(frame_base)
+        box.reparent_to(self._frame_base)
         box.set_pos(-0.5, -0.5, 0)
 
         if os.path.exists("wood.jpg"):
             wood_texture: core.Texture = self.loader.load_texture("wood.jpg")
-            frame_base.set_texture(wood_texture, 1)
+            self._frame_base.set_texture(wood_texture, 1)
         else:
-            frame_base.set_color(205 / 255, 133 / 255, 63 / 255)
-            frame_base.set_texture_off(1)
-
-        self._two_by_four: core.NodePath = self._scene.attach_new_node("two_by_four")
-        frame_base.copy_to(self._two_by_four)
-        self._two_by_four.set_scale(2, 4, 1)
-        self._two_by_four.hide()
-
-        self._two_by_six: core.NodePath = self._scene.attach_new_node("two_by_six")
-        frame_base.copy_to(self._two_by_six)
-        self._two_by_six.set_scale(2, 6, 1)
-        self._two_by_six.hide()
-
-        frame_base.remove_node()
+            self._frame_base.set_color(205 / 255, 133 / 255, 63 / 255)
+            self._frame_base.set_texture_off(1)
+        self._frame_base.hide()
 
         self._highlighter = highlighter.Highlighter(
             self.render,
@@ -93,7 +82,12 @@ class App(ShowBase):
             result: typing.List[typing.Dict[str, float]] = json.load(file)
 
         for details in result:
-            new_frame = self._build_wall_frame(details["length"], details["height"])
+            new_frame = self._build_wall_frame(
+                details["stud_width"],
+                details["stud_height"],
+                details["length"],
+                details["height"],
+            )
             new_frame.set_position(details["x"], details["y"], details["z"])
             new_frame.set_rotation(details["h"], details["p"], details["r"])
 
@@ -104,6 +98,8 @@ class App(ShowBase):
             position = frame_to_save.get_position()
             rotation = frame_to_save.get_rotation()
             details = {
+                "stud_width": frame_to_save.stud_width,
+                "stud_height": frame_to_save.stud_height,
                 "length": frame_to_save.length,
                 "height": frame_to_save.height,
                 "x": position.x,
@@ -119,7 +115,7 @@ class App(ShowBase):
             json.dump(result, file)
 
     def _add_frame(self):
-        self._build_wall_frame(32, self._EIGHT_FEET)
+        self._build_wall_frame(2, 4, 32, self._EIGHT_FEET)
 
     def _copy_frame(self):
         if self._highlighter.selected_frame is None:
@@ -156,21 +152,20 @@ class App(ShowBase):
 
         self._collision_world.set_debug_node(debug_node)
 
-    def _build_wall_frame(self, length: float, height: float):
+    def _build_wall_frame(
+        self, stud_width: float, stud_height: float, length: float, height: float
+    ):
         return frame.Frame(
-            self._scene, self._collision_world, length, height, self._new_two_by_four
+            self._scene, self._collision_world, 2, 4, length, height, self._new_stud
         )
 
-    def _new_two_by_four(self, parent: core.NodePath, length: float):
+    def _new_stud(
+        self, parent: core.NodePath, width: float, height: float, length: float
+    ):
         result = self._new_frame_piece(parent)
-        self._copy(self._two_by_four, result)
-
-        result.set_sz(length)
-        return result
-
-    def _new_two_by_six(self, parent: core.NodePath, length: float):
-        result = self._new_frame_piece(parent)
-        self._copy(self._two_by_six, result)
+        display: core.NodePath = result.attach_new_node("display")
+        self._copy(self._frame_base, display)
+        display.set_scale(width, height, 1)
 
         result.set_sz(length)
         return result

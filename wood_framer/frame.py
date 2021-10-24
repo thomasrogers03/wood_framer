@@ -18,59 +18,67 @@ class FrameDisplay:
     def __init__(
         self,
         display_parent: core.NodePath,
+        stud_width: float,
+        stud_height: float,
         length: float,
         height: float,
-        make_two_by_four: typing.Callable[[core.NodePath, float], core.NodePath],
+        make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
     ):
-        self._frame: core.NodePath = display_parent.attach_new_node("frame")
+        self._display_parent = display_parent
+
+        self._frame: core.NodePath = self._display_parent.attach_new_node("frame")
         self.destroy = self._frame.remove_node
         self.set_position = self._frame.set_pos
         self.set_rotation = self._frame.set_hpr
 
-        bottom = make_two_by_four(self._frame, length)
-        bottom.set_r(90)
-        bottom.set_z(1)
-        self._make_label(display_parent, bottom, self._length_message(length))
+        self._stud_width = stud_width
+        self._stud_height = stud_height
 
-        top = make_two_by_four(self._frame, length)
+        half_stud_width = self._stud_width / 2
+
+        bottom = make_stud(self._frame, self._stud_width, stud_height, length)
+        bottom.set_r(90)
+        bottom.set_z(half_stud_width)
+        self._make_label(bottom, self._length_message(length))
+
+        top = make_stud(self._frame, self._stud_width, stud_height, length)
         top.set_r(90)
-        top.set_z(height - 1)
-        self._make_label(display_parent, top, self._length_message(length))
+        top.set_z(height - half_stud_width)
+        self._make_label(top, self._length_message(length))
 
         wall_stud_length = height - 4
+        half_stud_height = self._stud_height / 2
 
         stud_count = int(length / self._SPACE_BETWEEN_STUDS)
         for stud_index in range(stud_count):
-            stud = make_two_by_four(self._frame, wall_stud_length)
-            stud.set_z(2)
-            stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS + 1)
-            self._make_label(
-                display_parent, stud, self._length_message(wall_stud_length)
+            stud = make_stud(
+                self._frame, self._stud_width, self._stud_height, wall_stud_length
             )
+            stud.set_z(half_stud_height)
+            stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS + half_stud_width)
+            self._make_label(stud, self._length_message(wall_stud_length))
 
         if stud_count * self._SPACE_BETWEEN_STUDS <= length:
-            stud = make_two_by_four(self._frame, wall_stud_length)
-            stud.set_z(2)
-            stud.set_x(length - 1)
-            self._make_label(
-                display_parent, stud, self._length_message(wall_stud_length)
+            stud = make_stud(
+                self._frame, self._stud_width, self._stud_height, wall_stud_length
             )
+            stud.set_z(half_stud_height)
+            stud.set_x(length - half_stud_width)
+            self._make_label(stud, self._length_message(wall_stud_length))
 
-    @staticmethod
-    def _length_message(inches: float):
+    def _length_message(self, inches: float):
         feet = 0
         while inches >= FrameDisplay._INCHES_TO_FEET:
             feet += 1
             inches -= FrameDisplay._INCHES_TO_FEET
-        message = "2x4x"
+        message = f'{self._stud_width}"x{self._stud_height}"x'
         if feet > 0:
             message += f"{feet}'"
         if inches > 0:
             message += f'{inches}"'
         return message
 
-    @staticmethod
-    def _make_label(scene: core.NodePath, parent: core.NodePath, text: str):
+    def _make_label(self, parent: core.NodePath, text: str):
         text_node = core.TextNode("label")
         text_node.set_text(text)
         text_node.set_text_color(1, 1, 1, 1)
@@ -81,7 +89,7 @@ class FrameDisplay:
         result: core.NodePath = parent.attach_new_node(text_node)
         result.set_pos(2, -4, 0.5)
         result.set_hpr(0, 0, -90)
-        result.set_scale(scene, core.Vec3(1, 1, 1))
+        result.set_scale(self._display_parent, core.Vec3(1, 1, 1))
         result.set_two_sided(True)
         result.set_light_off(1)
 
@@ -93,13 +101,18 @@ class Frame:
         self,
         scene: core.NodePath,
         world: bullet.BulletWorld,
+        stud_width: float,
+        stud_height: float,
         length: float,
         height: float,
-        make_two_by_four: typing.Callable[[core.NodePath, float], core.NodePath],
+        make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
     ):
+        self._stud_width = stud_width
+        self._stud_height = stud_height
         self._length = length
         self._height = height
-        self._make_two_by_four = make_two_by_four
+
+        self._make_stud = make_stud
         self._highlight = FrameHighlight.none
 
         frame_id = uuid.uuid4()
@@ -138,6 +151,14 @@ class Frame:
         return typing.cast(Frame, node.get_python_tag("frame"))
 
     @property
+    def stud_width(self):
+        return self._stud_width
+
+    @property
+    def stud_height(self):
+        return self._stud_height
+
+    @property
     def length(self):
         return self._length
 
@@ -169,7 +190,9 @@ class Frame:
         self._frame_boundry.set_scale(self._length, 4, self._height)
         self._frame_display = FrameDisplay(
             self._display_parent,
+            self._stud_width,
+            self._stud_height,
             self._length,
             self._height,
-            self._make_two_by_four,
+            self._make_stud,
         )
