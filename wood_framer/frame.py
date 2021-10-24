@@ -62,6 +62,7 @@ class Frame:
 
         frame_id = uuid.uuid4()
         self._display_parent: core.NodePath = scene.attach_new_node(f"frame-{frame_id}")
+        self.get_position = self._display_parent.get_pos
         self.set_position = self._display_parent.set_pos
         self.set_rotation = self._display_parent.set_hpr
 
@@ -76,9 +77,9 @@ class Frame:
         frame_boundry_node.set_python_tag("frame", self)
 
         world.attach(frame_boundry_node)
-        self._frame_boundry: typing.Optional[
-            core.NodePath
-        ] = self._display_parent.attach_new_node(frame_boundry_node)
+        self._frame_boundry: core.NodePath = self._display_parent.attach_new_node(
+            frame_boundry_node
+        )
 
         self._frame_display: typing.Optional[FrameDisplay] = None
         self.update(self._length, self._height)

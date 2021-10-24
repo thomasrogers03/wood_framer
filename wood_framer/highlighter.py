@@ -89,12 +89,12 @@ class Highlighter(DirectObject):
             return None, None
 
         mouse = self._mouse_watcher.get_mouse()
-        source = core.Point3()
-        target = core.Point3()
+        source: core.Point3 = core.Point3()
+        target: core.Point3 = core.Point3()
 
         self._lens.extrude(mouse, source, target)
 
-        source: core.Point3 = self._render.get_relative_point(self._camera, source)
-        target: core.Point3 = self._render.get_relative_point(self._camera, target)
+        source = self._render.get_relative_point(self._camera, source)
+        target = self._render.get_relative_point(self._camera, target)
 
         return source, target

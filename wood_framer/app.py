@@ -71,9 +71,24 @@ class App(ShowBase):
             self.camera,
             self._collision_world,
         )
-        self._frame_modifier = frame_modifier.FrameModifier(self._highlighter)
+        self._frame_modifier = frame_modifier.FrameModifier(
+            self._scene,
+            self.camera,
+            self._highlighter,
+            self._re_enable_mouse,
+            self.disable_mouse,
+        )
 
         self.task_mgr.do_method_later(self._TICK_RATE, self._tick, "tick")
+
+    def _re_enable_mouse(self):
+        camera: core.NodePath = self.camera
+        inverse_camera_transform = core.Mat4(camera.get_mat())
+        inverse_camera_transform.invertInPlace()
+
+        mouse_interface: core.Trackball = self.mouseInterfaceNode
+        mouse_interface.set_mat(inverse_camera_transform)
+        self.enable_mouse()
 
     def _tick(self, task):
         self._collision_world.do_physics(self._global_clock.get_dt())
