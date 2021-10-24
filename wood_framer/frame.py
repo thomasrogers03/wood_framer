@@ -62,7 +62,7 @@ class FrameDisplay:
         while inches >= FrameDisplay._INCHES_TO_FEET:
             feet += 1
             inches -= FrameDisplay._INCHES_TO_FEET
-        message = "length: "
+        message = "2x4x"
         if feet > 0:
             message += f"{feet}'"
         if inches > 0:
@@ -74,7 +74,7 @@ class FrameDisplay:
         text_node = core.TextNode("label")
         text_node.set_text(text)
         text_node.set_text_color(1, 1, 1, 1)
-        text_node.set_text_scale(2)
+        text_node.set_text_scale(3)
         text_node.set_shadow_color(0, 0, 0, 1)
         text_node.set_card_color(1, 1, 1, 1)
 
@@ -83,6 +83,7 @@ class FrameDisplay:
         result.set_hpr(0, 0, -90)
         result.set_scale(scene, core.Vec3(1, 1, 1))
         result.set_two_sided(True)
+        result.set_light_off(1)
 
         return result
 
