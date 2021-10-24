@@ -47,14 +47,13 @@ class FrameDisplay:
         self._make_label(top, self._length_message(length))
 
         wall_stud_length = height - 4
-        half_stud_height = self._stud_height / 2
 
         stud_count = int(length / self._SPACE_BETWEEN_STUDS)
         for stud_index in range(stud_count):
             stud = make_stud(
                 self._frame, self._stud_width, self._stud_height, wall_stud_length
             )
-            stud.set_z(half_stud_height)
+            stud.set_z(self._stud_width)
             stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS + half_stud_width)
             self._make_label(stud, self._length_message(wall_stud_length))
 
@@ -62,7 +61,7 @@ class FrameDisplay:
             stud = make_stud(
                 self._frame, self._stud_width, self._stud_height, wall_stud_length
             )
-            stud.set_z(half_stud_height)
+            stud.set_z(self._stud_width)
             stud.set_x(length - half_stud_width)
             self._make_label(stud, self._length_message(wall_stud_length))
 
@@ -191,7 +190,7 @@ class Frame:
         self._length = length
         self._height = height
 
-        self._frame_boundry.set_scale(self._length, 4, self._height)
+        self._frame_boundry.set_scale(self._length, self._stud_height, self._height)
         self._frame_display = FrameDisplay(
             self._display_parent,
             self._stud_width,

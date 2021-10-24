@@ -3,6 +3,7 @@ import os.path
 import typing
 import uuid
 
+from direct.gui import DirectGui
 from direct.showbase.ShowBase import ShowBase
 from panda3d import bullet, core
 
@@ -72,7 +73,43 @@ class App(ShowBase):
         self.accept("shift-d", self._copy_frame)
         self.accept("shift-s", self._save_work)
 
+        DirectGui.DirectButton(
+            parent=self.a2dTopRight,
+            text="New Frame",
+            command=self._add_frame,
+            scale=0.075,
+            pos=core.Point3(-0.22, -0.075),
+        )
+        DirectGui.DirectButton(
+            parent=self.a2dTopRight,
+            text='Change to 2"x4"',
+            command=self._change_to_two_by_four,
+            scale=0.075,
+            pos=core.Point3(-0.28, -0.17),
+        )
+        DirectGui.DirectButton(
+            parent=self.a2dTopRight,
+            text='Change to 2"x6"',
+            command=self._change_to_two_by_six,
+            scale=0.075,
+            pos=core.Point3(-0.28, -0.278),
+        )
+
         self._load_work()
+
+    def _change_to_two_by_four(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        frame_to_change.update(2, 4, frame_to_change.length, frame_to_change.height)
+
+    def _change_to_two_by_six(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        frame_to_change.update(2, 6, frame_to_change.length, frame_to_change.height)
 
     def _load_work(self):
         if not os.path.isfile(self._PROJECT_PATH):
@@ -156,7 +193,13 @@ class App(ShowBase):
         self, stud_width: float, stud_height: float, length: float, height: float
     ):
         return frame.Frame(
-            self._scene, self._collision_world, 2, 4, length, height, self._new_stud
+            self._scene,
+            self._collision_world,
+            stud_width,
+            stud_height,
+            length,
+            height,
+            self._new_stud,
         )
 
     def _new_stud(
