@@ -140,7 +140,7 @@ class Frame:
         )
 
         self._frame_display: typing.Optional[FrameDisplay] = None
-        self.update(self._length, self._height)
+        self.update(self._stud_width, self._stud_height, self._length, self._height)
 
     @staticmethod
     def frame_from_node_path(path: core.NodePath):
@@ -180,10 +180,14 @@ class Frame:
         else:
             self._display_parent.set_color(1, 1, 1, 1)
 
-    def update(self, length: float, height: float):
+    def update(
+        self, stud_width: float, stud_height: float, length: float, height: float
+    ):
         if self._frame_display is not None:
             self._frame_display.destroy()
 
+        self._stud_width = stud_width
+        self._stud_height = stud_height
         self._length = length
         self._height = height
 

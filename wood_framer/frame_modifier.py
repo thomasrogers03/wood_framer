@@ -85,7 +85,9 @@ class FrameModifier(DirectObject):
             return
 
         frame = self._highligher.selected_frame
-        frame.update(frame.length + amount, frame.height)
+        frame.update(
+            frame.stud_width, frame.stud_height, frame.length + amount, frame.height
+        )
 
     def _precheck_mouse(self):
         if self._highligher.selected_frame is None:
