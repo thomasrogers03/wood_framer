@@ -13,6 +13,7 @@ class App(ShowBase):
     _EIGHT_FEET = 8 * _INCHES_TO_FEET
     _TEN_FEET = 10 * _INCHES_TO_FEET
     _TWELVE_FEET = 12 * _INCHES_TO_FEET
+    _SPACE_BETWEEN_STUDS = 16
 
     def __init__(self):
         super().__init__()
@@ -54,16 +55,29 @@ class App(ShowBase):
 
         frame_base.remove_node()
 
-        piece = self._new_two_by_four(self._EIGHT_FEET)
-        piece.set_r(90)
+        self._build_wall_frame(self._TEN_FEET, self._EIGHT_FEET)
 
-        piece = self._new_two_by_four(self._EIGHT_FEET)
-        piece.set_r(90)
-        piece.set_z(self._EIGHT_FEET)
+    def _build_wall_frame(self, length: float, height: float):
+        bottom = self._new_two_by_four(length)
+        bottom.set_x(-1)
+        bottom.set_r(90)
+        bottom.set_z(1)
 
-        for piece_index in range(7):
-            piece = self._new_two_by_four(self._EIGHT_FEET)
-            piece.set_x(piece_index * 16)
+        top = self._new_two_by_four(length)
+        top.set_x(-1)
+        top.set_r(90)
+        top.set_z(height - 1)
+
+        stud_count = int(length / self._SPACE_BETWEEN_STUDS)
+        for stud_index in range(stud_count + 1):
+            stud = self._new_two_by_four(height - 4)
+            stud.set_z(2)
+            stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS)
+
+        if stud_count * self._SPACE_BETWEEN_STUDS < length:
+            stud = self._new_two_by_four(height - 4)
+            stud.set_z(2)
+            stud.set_x(length - 2)
 
     def _new_two_by_four(self, length: float):
         result = self._new_frame_piece()
