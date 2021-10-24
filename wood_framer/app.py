@@ -1,5 +1,5 @@
-import typing
 import os.path
+import typing
 import uuid
 
 from direct.showbase.ShowBase import ShowBase
@@ -17,6 +17,14 @@ class App(ShowBase):
     def __init__(self):
         super().__init__()
 
+        light_node_path = self.render.attach_new_node(core.DirectionalLight("light"))
+        self.render.set_light(light_node_path)
+
+        main_light = core.AmbientLight("light2")
+        main_light.set_color(core.Vec4(0.5, 0.5, 0.5, 1))
+        light_node_path = self.render.attach_new_node(main_light)
+        self.render.set_light(light_node_path)
+
         self._scene: core.NodePath = self.render.attach_new_node("scene")
         self._scene.set_scale(self._METRES_TO_INCHES)
 
@@ -29,7 +37,8 @@ class App(ShowBase):
             wood_texture: core.Texture = self.loader.load_texture("wood.jpg")
             frame_base.set_texture(wood_texture, 1)
         else:
-            frame_base.set_color(0.64, 0.16, 0.16)
+            frame_base.set_color(205 / 255, 133 / 255, 63 / 255)
+            frame_base.set_texture_off(1)
 
         self._two_by_four: core.NodePath = self._scene.attach_new_node("two_by_four")
         frame_base.copy_to(self._two_by_four)
@@ -47,11 +56,11 @@ class App(ShowBase):
 
         piece = self._new_two_by_four(self._EIGHT_FEET)
         piece.set_r(90)
-        
+
         piece = self._new_two_by_four(self._EIGHT_FEET)
         piece.set_r(90)
         piece.set_z(self._EIGHT_FEET)
-        
+
         for piece_index in range(7):
             piece = self._new_two_by_four(self._EIGHT_FEET)
             piece.set_x(piece_index * 16)
@@ -59,14 +68,14 @@ class App(ShowBase):
     def _new_two_by_four(self, length: float):
         result = self._new_frame_piece()
         self._copy(self._two_by_four, result)
-        
+
         result.set_sz(length)
         return result
 
     def _new_two_by_six(self, length: float):
         result = self._new_frame_piece()
         self._copy(self._two_by_six, result)
-        
+
         result.set_sz(length)
         return result
 
@@ -79,6 +88,3 @@ class App(ShowBase):
     def _new_frame_piece(self) -> core.NodePath:
         piece_id = uuid.uuid4()
         return self._scene.attach_new_node(f"frame-{piece_id}")
-
-
-App().run()
