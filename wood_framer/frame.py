@@ -1,7 +1,14 @@
+import enum
 import typing
 import uuid
 
 from panda3d import bullet, core
+
+
+class FrameHighlight(enum.Enum):
+    none = 0
+    highlighted = 1
+    selected = 2
 
 
 class FrameDisplay:
@@ -51,6 +58,7 @@ class Frame:
         self._length = length
         self._height = height
         self._make_two_by_four = make_two_by_four
+        self._highlight = FrameHighlight.none
 
         frame_id = uuid.uuid4()
         self._display_parent: core.NodePath = scene.attach_new_node(f"frame-{frame_id}")
@@ -65,6 +73,7 @@ class Frame:
         )
         frame_boundry_node.set_kinematic(True)
         frame_boundry_node.set_mass(0)
+        frame_boundry_node.set_python_tag("frame", self)
 
         world.attach(frame_boundry_node)
         self._frame_boundry: typing.Optional[
@@ -73,6 +82,31 @@ class Frame:
 
         self._frame_display: typing.Optional[FrameDisplay] = None
         self.update(self._length, self._height)
+
+    @staticmethod
+    def frame_from_node(node: bullet.BulletBodyNode):
+        return typing.cast(Frame, node.get_python_tag("frame"))
+
+    def get_size(self) -> core.Vec3:
+        min_bounds, max_bounds = typing.cast(
+            typing.Tuple[core.Point3, core.Point3],
+            self._display_parent.get_tight_bounds(),
+        )
+        return max_bounds - min_bounds
+
+    @property
+    def is_selected(self):
+        return self._highlight == FrameHighlight.selected
+
+    def set_highlight(self, highlight_type: FrameHighlight):
+        self._highlight = highlight_type
+
+        if self._highlight == FrameHighlight.highlighted:
+            self._display_parent.set_color(0, 1, 0, 1)
+        elif self._highlight == FrameHighlight.selected:
+            self._display_parent.set_color(0, 0, 1, 1)
+        else:
+            self._display_parent.set_color(1, 1, 1, 1)
 
     def update(self, length: float, height: float):
         if self._frame_display is not None:

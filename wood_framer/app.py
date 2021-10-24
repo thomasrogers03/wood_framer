@@ -5,7 +5,7 @@ import uuid
 from direct.showbase.ShowBase import ShowBase
 from panda3d import bullet, core
 
-from . import frame
+from . import frame, highlighter
 
 
 class App(ShowBase):
@@ -15,6 +15,7 @@ class App(ShowBase):
     _EIGHT_FEET = 8 * _INCHES_TO_FEET
     _TEN_FEET = 10 * _INCHES_TO_FEET
     _TWELVE_FEET = 12 * _INCHES_TO_FEET
+    _TICK_RATE = 1 / 35
 
     def __init__(self):
         super().__init__()
@@ -64,11 +65,20 @@ class App(ShowBase):
         frame.set_rotation(-90, 0, 0)
         frame.set_position(self._TWELVE_FEET - 2, -2, 0)
 
-        self.task_mgr.add(self._update)
+        self._highlighter = highlighter.Highlighter(
+            self.render,
+            self.mouseWatcherNode,
+            self.camLens,
+            self.camera,
+            self._collision_world,
+        )
 
-    def _update(self, task):
+        self.task_mgr.do_method_later(self._TICK_RATE, self._tick, "tick")
+
+    def _tick(self, task):
         self._collision_world.do_physics(self._global_clock.get_dt())
-        return task.cont
+        self._highlighter.update()
+        return task.again
 
     def _setup_bullet_debug(self):
         debug_node = bullet.BulletDebugNode("debug")
