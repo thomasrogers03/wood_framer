@@ -31,6 +31,43 @@ class FrameModifier(DirectObject):
         self.accept("shift-mouse1", self._precheck_mouse)
         self.accept("mouse1-up", self._apply_transform)
 
+        self.accept("-", self._decrease_length)
+        self.accept("--repeat", self._decrease_length)
+        self.accept("+", self._increase_length)
+        self.accept("+-repeat", self._increase_length)
+
+        self.accept("arrow_left", self._decrease_rotation)
+        self.accept("arrow_left-repeat", self._decrease_rotation)
+        self.accept("arrow_right", self._increase_rotation)
+        self.accept("arrow_right-repeat", self._increase_rotation)
+
+    def _decrease_rotation(self):
+        self._change_rotation(-45)
+
+    def _increase_rotation(self):
+        self._change_rotation(45)
+
+    def _change_rotation(self, amount: float):
+        if self._highligher.selected_frame is None:
+            return
+
+        frame = self._highligher.selected_frame
+        rotation = frame.get_rotation()
+        frame.set_rotation(rotation + core.Vec3(amount, 0, 0))
+
+    def _decrease_length(self):
+        self._change_length(-1)
+
+    def _increase_length(self):
+        self._change_length(1)
+
+    def _change_length(self, amount: float):
+        if self._highligher.selected_frame is None:
+            return
+
+        frame = self._highligher.selected_frame
+        frame.update(frame.length + amount, frame.height)
+
     def _precheck_mouse(self):
         if self._highligher.selected_frame is None:
             return

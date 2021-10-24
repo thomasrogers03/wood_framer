@@ -64,6 +64,7 @@ class Frame:
         self._display_parent: core.NodePath = scene.attach_new_node(f"frame-{frame_id}")
         self.get_position = self._display_parent.get_pos
         self.set_position = self._display_parent.set_pos
+        self.get_rotation = self._display_parent.get_hpr
         self.set_rotation = self._display_parent.set_hpr
 
         frame_boundry_shape = bullet.BulletBoxShape(core.Vec3(0.5, 0.5, 0.5))
@@ -88,12 +89,13 @@ class Frame:
     def frame_from_node(node: bullet.BulletBodyNode):
         return typing.cast(Frame, node.get_python_tag("frame"))
 
-    def get_size(self) -> core.Vec3:
-        min_bounds, max_bounds = typing.cast(
-            typing.Tuple[core.Point3, core.Point3],
-            self._display_parent.get_tight_bounds(),
-        )
-        return max_bounds - min_bounds
+    @property
+    def length(self):
+        return self._length
+
+    @property
+    def height(self):
+        return self._height
 
     @property
     def is_selected(self):
