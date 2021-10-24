@@ -24,12 +24,20 @@ class Highlighter(DirectObject):
         self._highlighted_frame: typing.Optional[frame.Frame] = None
         self._selected_frame: typing.Optional[frame.Frame] = None
 
+        self._mouse_down = False
         self._last_mouse_position = core.Point2()
 
         self.accept("mouse1", self._precheck_mouse)
         self.accept("mouse1-up", self._handle_mouse_click)
 
+    @property
+    def selected_frame(self):
+        return self._selected_frame
+
     def update(self):
+        if self._mouse_down:
+            return
+
         source, target = self._extrude_mouse_to_render_transform()
         if source is None:
             return
@@ -47,11 +55,20 @@ class Highlighter(DirectObject):
                 self._highlighted_frame = highlighted_frame
                 self._highlighted_frame.set_highlight(frame.FrameHighlight.highlighted)
 
+    def get_mouse_position(self):
+        if not self._mouse_watcher.has_mouse():
+            return core.Point2()
+
+        return typing.cast(core.Point2, self._mouse_watcher.get_mouse())
+
     def _precheck_mouse(self):
-        self._last_mouse_position = core.Point2(self._get_mouse_position())
+        self._last_mouse_position = core.Point2(self.get_mouse_position())
+        self._mouse_down = True
 
     def _handle_mouse_click(self):
-        new_mouse_position = core.Point2(self._get_mouse_position())
+        self._mouse_down = False
+
+        new_mouse_position = core.Point2(self.get_mouse_position())
         mouse_delta: core.Vec2 = new_mouse_position - self._last_mouse_position
         if mouse_delta.length_squared() > 0.00001:
             return
@@ -64,12 +81,6 @@ class Highlighter(DirectObject):
             self._selected_frame = self._highlighted_frame
             self._selected_frame.set_highlight(frame.FrameHighlight.selected)
             self._highlighted_frame = None
-
-    def _get_mouse_position(self):
-        if not self._mouse_watcher.has_mouse():
-            return core.Point2()
-
-        return typing.cast(core.Point2, self._mouse_watcher.get_mouse())
 
     def _extrude_mouse_to_render_transform(
         self,

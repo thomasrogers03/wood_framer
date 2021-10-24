@@ -1,11 +1,10 @@
 import os.path
-import typing
 import uuid
 
 from direct.showbase.ShowBase import ShowBase
 from panda3d import bullet, core
 
-from . import frame, highlighter
+from . import frame, frame_modifier, highlighter
 
 
 class App(ShowBase):
@@ -72,12 +71,14 @@ class App(ShowBase):
             self.camera,
             self._collision_world,
         )
+        self._frame_modifier = frame_modifier.FrameModifier(self._highlighter)
 
         self.task_mgr.do_method_later(self._TICK_RATE, self._tick, "tick")
 
     def _tick(self, task):
         self._collision_world.do_physics(self._global_clock.get_dt())
         self._highlighter.update()
+        self._frame_modifier.update()
         return task.again
 
     def _setup_bullet_debug(self):
