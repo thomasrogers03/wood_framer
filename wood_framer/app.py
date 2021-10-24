@@ -58,47 +58,51 @@ class App(ShowBase):
         self._build_wall_frame(self._TEN_FEET, self._EIGHT_FEET)
 
     def _build_wall_frame(self, length: float, height: float):
-        bottom = self._new_two_by_four(length)
+        frame_id = uuid.uuid4()
+        parent: core.NodePath = self._scene.attach_new_node(f"frame-{frame_id}")
+
+        bottom = self._new_two_by_four(parent, length)
         bottom.set_x(-1)
         bottom.set_r(90)
         bottom.set_z(1)
 
-        top = self._new_two_by_four(length)
+        top = self._new_two_by_four(parent, length)
         top.set_x(-1)
         top.set_r(90)
         top.set_z(height - 1)
 
         stud_count = int(length / self._SPACE_BETWEEN_STUDS)
         for stud_index in range(stud_count + 1):
-            stud = self._new_two_by_four(height - 4)
+            stud = self._new_two_by_four(parent, height - 4)
             stud.set_z(2)
             stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS)
 
         if stud_count * self._SPACE_BETWEEN_STUDS < length:
-            stud = self._new_two_by_four(height - 4)
+            stud = self._new_two_by_four(parent, height - 4)
             stud.set_z(2)
             stud.set_x(length - 2)
 
-    def _new_two_by_four(self, length: float):
-        result = self._new_frame_piece()
+    def _new_two_by_four(self, parent: core.NodePath, length: float):
+        result = self._new_frame_piece(parent)
         self._copy(self._two_by_four, result)
 
         result.set_sz(length)
         return result
 
-    def _new_two_by_six(self, length: float):
-        result = self._new_frame_piece()
+    def _new_two_by_six(self, parent: core.NodePath, length: float):
+        result = self._new_frame_piece(parent)
         self._copy(self._two_by_six, result)
 
         result.set_sz(length)
         return result
 
     @staticmethod
+    def _new_frame_piece(parent: core.NodePath) -> core.NodePath:
+        piece_id = uuid.uuid4()
+        return parent.attach_new_node(f"stud-{piece_id}")
+
+    @staticmethod
     def _copy(source: core.NodePath, destination: core.NodePath):
         source.show()
         source.copy_to(destination)
         source.hide()
-
-    def _new_frame_piece(self) -> core.NodePath:
-        piece_id = uuid.uuid4()
-        return self._scene.attach_new_node(f"frame-{piece_id}")
