@@ -59,7 +59,8 @@ class App(ShowBase):
 
         frame_base.remove_node()
 
-        self._build_wall_frame(self._TWELVE_FEET, self._EIGHT_FEET)
+        frame = self._build_wall_frame(self._TWELVE_FEET, self._EIGHT_FEET)
+        frame.update(24, 64)
 
         self.task_mgr.add(self._update)
 
@@ -79,10 +80,9 @@ class App(ShowBase):
         self._collision_world.set_debug_node(debug_node)
 
     def _build_wall_frame(self, length: float, height: float):
-        display = frame.FrameDisplay(
+        return frame.Frame(
             self._scene, self._collision_world, length, height, self._new_two_by_four
         )
-        return frame.Frame(display)
 
     def _new_two_by_four(self, parent: core.NodePath, length: float):
         result = self._new_frame_piece(parent)
