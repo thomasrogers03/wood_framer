@@ -4,7 +4,7 @@ import uuid
 
 from panda3d import bullet, core
 
-from . import frame_display, wall_frame
+from . import frame_display
 
 
 class FrameHighlight(enum.Enum):
