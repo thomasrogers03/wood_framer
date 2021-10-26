@@ -30,29 +30,35 @@ class Display(frame_display.FrameDisplay):
 
         half_stud_width = self._stud_width / 2
 
-        bottom = make_stud(self._frame, self._stud_width, stud_height, length)
-        bottom.set_r(90)
-        bottom.set_z(half_stud_width)
-        self._make_label(bottom, self._length_message(length))
-
         top = make_stud(self._frame, self._stud_width, stud_height, length)
         top.set_r(90)
         top.set_z(height - half_stud_width)
         self._make_label(top, self._length_message(length))
 
-        frame_stud_length = min(self._SEVEN_FEET, height - 2 * stud_width)
+        frame_stud_length = min(self._SEVEN_FEET, height - half_stud_width)
+
+        support_top = make_stud(self._frame, self._stud_width, stud_height, length)
+        support_top.set_r(90)
+        support_top.set_z(frame_stud_length + half_stud_width)
+        self._make_label(support_top, self._length_message(length))
+
+        support_length = height - frame_stud_length - 2 * self._stud_width
+        support_centre = make_stud(
+            self._frame, self._stud_width, stud_height, support_length
+        )
+        support_centre.set_z(frame_stud_length + self._stud_width)
+        support_centre.set_x(length / 2)
+        self._make_label(support_centre, self._length_message(support_length))
 
         left_stud = make_stud(
             self._frame, self._stud_width, self._stud_height, frame_stud_length
         )
-        left_stud.set_z(self._stud_width)
         left_stud.set_x(half_stud_width)
         self._make_label(left_stud, self._length_message(frame_stud_length))
 
         right_stud = make_stud(
             self._frame, self._stud_width, self._stud_height, frame_stud_length
         )
-        right_stud.set_z(self._stud_width)
         right_stud.set_x(length - half_stud_width)
         self._make_label(right_stud, self._length_message(frame_stud_length))
 
