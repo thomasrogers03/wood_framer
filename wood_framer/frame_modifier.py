@@ -36,6 +36,11 @@ class FrameModifier(DirectObject):
         self.accept("+", self._increase_length)
         self.accept("+-repeat", self._increase_length)
 
+        self.accept("shift--", self._decrease_height)
+        self.accept("shift---repeat", self._decrease_height)
+        self.accept("shift-+", self._increase_height)
+        self.accept("shift-+-repeat", self._increase_height)
+
         self.accept("arrow_left", self._decrease_heading)
         self.accept("arrow_left-repeat", self._decrease_heading)
         self.accept("arrow_right", self._increase_heading)
@@ -73,6 +78,21 @@ class FrameModifier(DirectObject):
         frame = self._highligher.selected_frame
         rotation = frame.get_rotation()
         frame.set_rotation(rotation + core.Vec3(amount, 0, 0))
+
+    def _decrease_height(self):
+        self._change_height(-1)
+
+    def _increase_height(self):
+        self._change_height(1)
+
+    def _change_height(self, amount: float):
+        if self._highligher.selected_frame is None:
+            return
+
+        frame = self._highligher.selected_frame
+        frame.update(
+            frame.stud_width, frame.stud_height, frame.length, frame.height + amount
+        )
 
     def _decrease_length(self):
         self._change_length(-1)

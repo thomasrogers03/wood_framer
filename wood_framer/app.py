@@ -94,6 +94,13 @@ class App(ShowBase):
             scale=0.075,
             pos=core.Point3(-0.28, -0.278),
         )
+        DirectGui.DirectButton(
+            parent=self.a2dTopRight,
+            text="Save Work",
+            command=self._save_work,
+            scale=0.075,
+            pos=core.Point3(-0.205, -0.385),
+        )
 
         self._load_work()
 
