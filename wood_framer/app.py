@@ -7,9 +7,15 @@ from direct.gui import DirectGui, DirectGuiBase
 from direct.showbase.ShowBase import ShowBase
 from panda3d import bullet, core
 
-from wood_framer import frame_display
-
-from . import door_frame, frame, frame_modifier, highlighter, wall_frame
+from . import (
+    door_frame,
+    frame,
+    frame_display,
+    frame_modifier,
+    highlighter,
+    roof_frame,
+    wall_frame,
+)
 
 
 class App(ShowBase):
@@ -130,6 +136,15 @@ class App(ShowBase):
                 pos=core.Point3(-0.288, -0.588),
             )
         )
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text="Change to Roof",
+                command=self._change_frame_to_roof,
+                scale=0.075,
+                pos=core.Point3(-0.288, -0.698),
+            )
+        )
 
         self._load_work()
 
@@ -157,6 +172,19 @@ class App(ShowBase):
             frame_to_change.length,
             frame_to_change.height,
             door_frame.Display,
+        )
+
+    def _change_frame_to_roof(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        frame_to_change.update(
+            frame_to_change.stud_width,
+            frame_to_change.stud_height,
+            frame_to_change.length,
+            frame_to_change.height,
+            roof_frame.Display,
         )
 
     def _debug_gui(self, component: DirectGuiBase.DirectGuiWidget):

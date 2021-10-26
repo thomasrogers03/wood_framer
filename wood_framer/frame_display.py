@@ -6,6 +6,7 @@ from panda3d import core
 
 class FrameDisplay(metaclass=abc.ABCMeta):
     SERIALIZED_NAME = "undefined"
+    _INCHES_TO_FEET = 12
 
     _display_parent: core.NodePath
 
@@ -22,6 +23,18 @@ class FrameDisplay(metaclass=abc.ABCMeta):
 
     def destroy(self):
         self._frame.remove_node()
+
+    def _length_message(self, inches: float):
+        feet = 0
+        while inches >= FrameDisplay._INCHES_TO_FEET:
+            feet += 1
+            inches -= FrameDisplay._INCHES_TO_FEET
+        message = f'{self._stud_width}"x{self._stud_height}"x'
+        if feet > 0:
+            message += f"{feet}'"
+        if inches > 0:
+            message += f'{inches}"'
+        return message
 
     def _make_label(self, parent: core.NodePath, text: str):
         text_node = core.TextNode("label")
