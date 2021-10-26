@@ -147,7 +147,7 @@ class FrameModifier(DirectObject):
             [transform_vector.x, transform_vector.y, transform_vector.z],
             key=lambda component: math.fabs(component),
         )
-        snapped_max_component = round(max_component)
+        snapped_max_component = round(max_component * 2) / 2
 
         if max_component == transform_vector.x:
             transform_direction = core.Vec3(snapped_max_component, 0, 0)

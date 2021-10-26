@@ -335,9 +335,9 @@ class App(ShowBase):
     def _setup_bullet_debug(self):
         debug_node = bullet.BulletDebugNode("debug")
         debug_node.show_wireframe(True)
-        debug_node.show_constraints(True)
-        debug_node.show_bounding_boxes(True)
-        debug_node.show_normals(True)
+        debug_node.show_constraints(False)
+        debug_node.show_bounding_boxes(False)
+        debug_node.show_normals(False)
         debug: core.NodePath = self.render.attach_new_node(debug_node)
         debug.show()
 

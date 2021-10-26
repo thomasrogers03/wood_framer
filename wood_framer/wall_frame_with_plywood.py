@@ -24,6 +24,8 @@ class Display(wall_frame.Display):
         outside_board = make_stud(self._frame, length, 1 / 2, height)
         outside_board.set_x(length / 2)
         outside_board.set_y(-(self._stud_height / 2 + 1 / 4))
+        outside_board.set_transparency(True)
+        outside_board.set_alpha_scale(0.75)
 
     @staticmethod
     def create(
