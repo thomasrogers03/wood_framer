@@ -15,6 +15,7 @@ from . import (
     highlighter,
     roof_frame,
     wall_frame,
+    wall_frame_with_plywood,
 )
 
 
@@ -146,6 +147,15 @@ class App(ShowBase):
                 pos=core.Point3(-0.288, -0.698),
             )
         )
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text="Change to Wall w/ Ply Wood",
+                command=self._change_frame_to_wall_with_ply_wood,
+                scale=0.075,
+                pos=core.Point3(-0.498, -0.812),
+            )
+        )
 
         self._load_work()
 
@@ -168,6 +178,19 @@ class App(ShowBase):
             frame_to_change.length,
             frame_to_change.height,
             wall_frame.Display,
+        )
+
+    def _change_frame_to_wall_with_ply_wood(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        frame_to_change.update(
+            frame_to_change.stud_width,
+            frame_to_change.stud_height,
+            frame_to_change.length,
+            frame_to_change.height,
+            wall_frame_with_plywood.Display,
         )
 
     def _change_frame_to_door(self):
