@@ -36,3 +36,6 @@ class Display(frame_display.FrameDisplay):
         return Display(
             display_parent, stud_width, stud_height, length, height, make_stud
         )
+
+
+frame_display.register(Display.SERIALIZED_NAME, Display)

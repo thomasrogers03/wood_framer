@@ -71,9 +71,6 @@ class Display(frame_display.FrameDisplay):
             display_parent, stud_width, stud_height, length, height, make_stud
         )
 
-    def destroy(self):
-        self._frame.remove_node()
-
     def _length_message(self, inches: float):
         feet = 0
         while inches >= Display._INCHES_TO_FEET:
@@ -85,3 +82,6 @@ class Display(frame_display.FrameDisplay):
         if inches > 0:
             message += f'{inches}"'
         return message
+
+
+frame_display.register(Display.SERIALIZED_NAME, Display)

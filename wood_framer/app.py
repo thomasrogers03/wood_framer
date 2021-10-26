@@ -7,6 +7,8 @@ from direct.gui import DirectGui, DirectGuiBase
 from direct.showbase.ShowBase import ShowBase
 from panda3d import bullet, core
 
+from wood_framer import frame_display
+
 from . import door_frame, frame, frame_modifier, highlighter, wall_frame
 
 
@@ -208,6 +210,7 @@ class App(ShowBase):
                 details["stud_height"],
                 details["length"],
                 details["height"],
+                frame_display.get_klass(details["frame_type"]),
             )
             new_frame.set_position(details["x"], details["y"], details["z"])
             new_frame.set_rotation(details["h"], details["p"], details["r"])
@@ -237,14 +240,20 @@ class App(ShowBase):
             json.dump(result, file)
 
     def _add_frame(self):
-        self._build_wall_frame(2, 4, 32, self._EIGHT_FEET)
+        self._build_wall_frame(2, 4, 32, self._EIGHT_FEET, wall_frame.Display)
 
     def _copy_frame(self):
         if self._highlighter.selected_frame is None:
             return
 
         old_frame = self._highlighter.selected_frame
-        new_frame = self._build_wall_frame(old_frame.length, old_frame.height)
+        new_frame = self._build_wall_frame(
+            old_frame.stud_width,
+            old_frame.stud_height,
+            old_frame.length,
+            old_frame.height,
+            old_frame.display_klass,
+        )
         new_frame.set_position(old_frame.get_position())
         new_frame.set_rotation(old_frame.get_rotation())
 
@@ -275,7 +284,12 @@ class App(ShowBase):
         self._collision_world.set_debug_node(debug_node)
 
     def _build_wall_frame(
-        self, stud_width: float, stud_height: float, length: float, height: float
+        self,
+        stud_width: float,
+        stud_height: float,
+        length: float,
+        height: float,
+        display_klass: typing.Type[frame_display.FrameDisplay],
     ):
         return frame.Frame(
             self._scene,
@@ -285,7 +299,7 @@ class App(ShowBase):
             length,
             height,
             self._new_stud,
-            wall_frame.Display,
+            display_klass,
         )
 
     def _new_stud(

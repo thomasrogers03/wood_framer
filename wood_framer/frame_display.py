@@ -6,7 +6,7 @@ from panda3d import core
 
 class FrameDisplay(metaclass=abc.ABCMeta):
     SERIALIZED_NAME = "undefined"
-    
+
     _display_parent: core.NodePath
 
     @staticmethod
@@ -19,9 +19,9 @@ class FrameDisplay(metaclass=abc.ABCMeta):
         make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
     ) -> "FrameDisplay":
         raise NotImplementedError()
-    
-    def destroy(self) -> None:
-        raise NotImplementedError()
+
+    def destroy(self):
+        self._frame.remove_node()
 
     def _make_label(self, parent: core.NodePath, text: str):
         text_node = core.TextNode("label")
@@ -39,3 +39,14 @@ class FrameDisplay(metaclass=abc.ABCMeta):
         result.set_light_off(1)
 
         return result
+
+
+_display_types: typing.Dict[str, typing.Type[FrameDisplay]] = {}
+
+
+def register(name: str, klass: typing.Type[FrameDisplay]):
+    _display_types[name] = klass
+
+
+def get_klass(name: str):
+    return _display_types[name]
