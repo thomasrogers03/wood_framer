@@ -40,22 +40,36 @@ class Display(frame_display.FrameDisplay):
 
         wall_stud_length = height - 2 * stud_width
 
-        stud_count = int(length / self._SPACE_BETWEEN_STUDS)
-        for stud_index in range(stud_count):
-            stud = make_stud(
-                self._frame, self._stud_width, self._stud_height, wall_stud_length
-            )
-            stud.set_z(self._stud_width)
-            stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS + half_stud_width)
-            self._make_label(stud, self._length_message(wall_stud_length))
+        x = -half_stud_width
+        length_left = length
 
-        if stud_count * self._SPACE_BETWEEN_STUDS <= length:
+        x += self._stud_width
+        length_left -= self._stud_width
+        left_stud = make_stud(
+            self._frame, self._stud_width, self._stud_height, wall_stud_length
+        )
+        left_stud.set_z(self._stud_width)
+        left_stud.set_x(x)
+        self._make_label(left_stud, self._length_message(wall_stud_length))
+        x += self._SPACE_BETWEEN_STUDS
+
+        while length_left >= self._SPACE_BETWEEN_STUDS:
             stud = make_stud(
                 self._frame, self._stud_width, self._stud_height, wall_stud_length
             )
             stud.set_z(self._stud_width)
-            stud.set_x(length - half_stud_width)
+            stud.set_x(x)
             self._make_label(stud, self._length_message(wall_stud_length))
+            x += self._SPACE_BETWEEN_STUDS
+            length_left -= self._SPACE_BETWEEN_STUDS
+
+        if length_left > 0:
+            right_stud = make_stud(
+                self._frame, self._stud_width, self._stud_height, wall_stud_length
+            )
+            right_stud.set_z(self._stud_width)
+            right_stud.set_x(length - half_stud_width)
+            self._make_label(right_stud, self._length_message(wall_stud_length))
 
     @staticmethod
     def create(
