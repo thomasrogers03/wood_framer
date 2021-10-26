@@ -2,7 +2,7 @@ import typing
 
 from panda3d import core
 
-from . import frame_display
+from . import frame_display, stud
 
 
 class Display(frame_display.FrameDisplay):
@@ -26,20 +26,17 @@ class Display(frame_display.FrameDisplay):
         self._stud_width = stud_width
         self._stud_height = stud_height
 
-        half_stud_width = self._stud_width / 2
-
-        stud_count = int(length / self._SPACE_BETWEEN_STUDS)
-        for stud_index in range(stud_count):
-            stud = make_stud(self._frame, self._stud_width, self._stud_height, height)
-            stud.set_z(self._stud_width)
-            stud.set_x(stud_index * self._SPACE_BETWEEN_STUDS + half_stud_width)
-            self._make_label(stud, self._length_message(height))
-
-        if stud_count * self._SPACE_BETWEEN_STUDS <= length:
-            stud = make_stud(self._frame, self._stud_width, self._stud_height, height)
-            stud.set_z(self._stud_width)
-            stud.set_x(length - half_stud_width)
-            self._make_label(stud, self._length_message(height))
+        stud.add_studs(
+            self._display_parent,
+            self._frame,
+            self._stud_width,
+            self._stud_height,
+            length,
+            height,
+            self._SPACE_BETWEEN_STUDS,
+            self._stud_width,
+            make_stud,
+        )
 
     @staticmethod
     def create(
