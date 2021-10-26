@@ -4,7 +4,7 @@ import uuid
 
 from panda3d import bullet, core
 
-from . import wall_frame
+from . import frame_display, wall_frame
 
 
 class FrameHighlight(enum.Enum):
@@ -23,11 +23,13 @@ class Frame:
         length: float,
         height: float,
         make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
+        display_klass: typing.Type[frame_display.FrameDisplay],
     ):
         self._stud_width = stud_width
         self._stud_height = stud_height
         self._length = length
         self._height = height
+        self._display_klass = display_klass
 
         self._make_stud = make_stud
         self._highlight = FrameHighlight.none
@@ -56,8 +58,14 @@ class Frame:
             frame_boundry_node
         )
 
-        self._frame_display: typing.Optional[wall_frame.Display] = None
-        self.update(self._stud_width, self._stud_height, self._length, self._height)
+        self._frame_display: typing.Optional[frame_display.FrameDisplay] = None
+        self.update(
+            self._stud_width,
+            self._stud_height,
+            self._length,
+            self._height,
+            self._display_klass,
+        )
 
     @staticmethod
     def frame_from_node_path(path: core.NodePath):
@@ -84,6 +92,10 @@ class Frame:
         return self._height
 
     @property
+    def display_klass(self):
+        return self._display_klass
+
+    @property
     def is_selected(self):
         return self._highlight == FrameHighlight.selected
 
@@ -98,7 +110,12 @@ class Frame:
             self._display_parent.set_color(1, 1, 1, 1)
 
     def update(
-        self, stud_width: float, stud_height: float, length: float, height: float
+        self,
+        stud_width: float,
+        stud_height: float,
+        length: float,
+        height: float,
+        display_klass: typing.Type[frame_display.FrameDisplay],
     ):
         if self._frame_display is not None:
             self._frame_display.destroy()
@@ -109,7 +126,7 @@ class Frame:
         self._height = height
 
         self._frame_boundry.set_scale(self._length, self._stud_height, self._height)
-        self._frame_display = wall_frame.Display(
+        self._frame_display = display_klass.create(
             self._display_parent,
             self._stud_width,
             self._stud_height,

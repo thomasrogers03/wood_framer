@@ -2,7 +2,7 @@ import math
 import typing
 
 from direct.showbase.DirectObject import DirectObject
-from panda3d import bullet, core
+from panda3d import core
 
 from . import highlighter
 
@@ -91,7 +91,11 @@ class FrameModifier(DirectObject):
 
         frame = self._highligher.selected_frame
         frame.update(
-            frame.stud_width, frame.stud_height, frame.length, frame.height + amount
+            frame.stud_width,
+            frame.stud_height,
+            frame.length,
+            frame.height + amount,
+            frame.display_klass,
         )
 
     def _decrease_length(self):
@@ -106,7 +110,11 @@ class FrameModifier(DirectObject):
 
         frame = self._highligher.selected_frame
         frame.update(
-            frame.stud_width, frame.stud_height, frame.length + amount, frame.height
+            frame.stud_width,
+            frame.stud_height,
+            frame.length + amount,
+            frame.height,
+            frame.display_klass,
         )
 
     def _precheck_mouse(self):

@@ -2,8 +2,10 @@ import typing
 
 from panda3d import core
 
+from . import frame_display
 
-class Display:
+
+class Display(frame_display.FrameDisplay):
     _SPACE_BETWEEN_STUDS = 16
     _INCHES_TO_FEET = 12
 
@@ -19,9 +21,6 @@ class Display:
         self._display_parent = display_parent
 
         self._frame: core.NodePath = self._display_parent.attach_new_node("frame")
-        self.destroy = self._frame.remove_node
-        self.set_position = self._frame.set_pos
-        self.set_rotation = self._frame.set_hpr
 
         self._stud_width = stud_width
         self._stud_height = stud_height
@@ -57,6 +56,22 @@ class Display:
             stud.set_x(length - half_stud_width)
             self._make_label(stud, self._length_message(wall_stud_length))
 
+    @staticmethod
+    def create(
+        display_parent: core.NodePath,
+        stud_width: float,
+        stud_height: float,
+        length: float,
+        height: float,
+        make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
+    ) -> frame_display.FrameDisplay:
+        return Display(
+            display_parent, stud_width, stud_height, length, height, make_stud
+        )
+
+    def destroy(self):
+        self._frame.remove_node()
+
     def _length_message(self, inches: float):
         feet = 0
         while inches >= Display._INCHES_TO_FEET:
@@ -68,20 +83,3 @@ class Display:
         if inches > 0:
             message += f'{inches}"'
         return message
-
-    def _make_label(self, parent: core.NodePath, text: str):
-        text_node = core.TextNode("label")
-        text_node.set_text(text)
-        text_node.set_text_color(1, 1, 1, 1)
-        text_node.set_text_scale(3)
-        text_node.set_shadow_color(0, 0, 0, 1)
-        text_node.set_card_color(1, 1, 1, 1)
-
-        result: core.NodePath = parent.attach_new_node(text_node)
-        result.set_pos(2, -4, 0.5)
-        result.set_hpr(0, 0, -90)
-        result.set_scale(self._display_parent, core.Vec3(1, 1, 1))
-        result.set_two_sided(True)
-        result.set_light_off(1)
-
-        return result

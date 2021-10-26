@@ -7,7 +7,7 @@ from direct.gui import DirectGui
 from direct.showbase.ShowBase import ShowBase
 from panda3d import bullet, core
 
-from . import frame, frame_modifier, highlighter
+from . import frame, frame_modifier, highlighter, wall_frame
 
 
 class App(ShowBase):
@@ -109,14 +109,26 @@ class App(ShowBase):
             return
 
         frame_to_change = self._highlighter.selected_frame
-        frame_to_change.update(2, 4, frame_to_change.length, frame_to_change.height)
+        frame_to_change.update(
+            2,
+            4,
+            frame_to_change.length,
+            frame_to_change.height,
+            frame_to_change.display_klass,
+        )
 
     def _change_to_two_by_six(self):
         if self._highlighter.selected_frame is None:
             return
 
         frame_to_change = self._highlighter.selected_frame
-        frame_to_change.update(2, 6, frame_to_change.length, frame_to_change.height)
+        frame_to_change.update(
+            2,
+            6,
+            frame_to_change.length,
+            frame_to_change.height,
+            frame_to_change.display_klass,
+        )
 
     def _load_work(self):
         if not os.path.isfile(self._PROJECT_PATH):
@@ -207,6 +219,7 @@ class App(ShowBase):
             length,
             height,
             self._new_stud,
+            wall_frame.Display,
         )
 
     def _new_stud(
