@@ -3,11 +3,11 @@ import os.path
 import typing
 import uuid
 
-from direct.gui import DirectGui
+from direct.gui import DirectGui, DirectGuiBase
 from direct.showbase.ShowBase import ShowBase
 from panda3d import bullet, core
 
-from . import frame, frame_modifier, highlighter, wall_frame
+from . import door_frame, frame, frame_modifier, highlighter, wall_frame
 
 
 class App(ShowBase):
@@ -20,10 +20,11 @@ class App(ShowBase):
     _TICK_RATE = 1 / 35
     _PROJECT_PATH = "project.json"
 
-    def __init__(self):
+    def __init__(self, debug_gui: bool):
         super().__init__()
 
         self._global_clock: core.ClockObject = globalClock
+        self._debugging_gui = debug_gui
 
         light_node_path = self.render.attach_new_node(core.DirectionalLight("light"))
         self.render.set_light(light_node_path)
@@ -73,36 +74,100 @@ class App(ShowBase):
         self.accept("shift-d", self._copy_frame)
         self.accept("shift-s", self._save_work)
 
-        DirectGui.DirectButton(
-            parent=self.a2dTopRight,
-            text="New Frame",
-            command=self._add_frame,
-            scale=0.075,
-            pos=core.Point3(-0.22, -0.075),
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text="New Frame",
+                command=self._add_frame,
+                scale=0.075,
+                pos=core.Point3(-0.22, -0.075),
+            )
         )
-        DirectGui.DirectButton(
-            parent=self.a2dTopRight,
-            text='Change to 2"x4"',
-            command=self._change_to_two_by_four,
-            scale=0.075,
-            pos=core.Point3(-0.28, -0.17),
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text='Change to 2"x4"',
+                command=self._change_to_two_by_four,
+                scale=0.075,
+                pos=core.Point3(-0.28, -0.17),
+            )
         )
-        DirectGui.DirectButton(
-            parent=self.a2dTopRight,
-            text='Change to 2"x6"',
-            command=self._change_to_two_by_six,
-            scale=0.075,
-            pos=core.Point3(-0.28, -0.278),
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text='Change to 2"x6"',
+                command=self._change_to_two_by_six,
+                scale=0.075,
+                pos=core.Point3(-0.28, -0.278),
+            )
         )
-        DirectGui.DirectButton(
-            parent=self.a2dTopRight,
-            text="Save Work",
-            command=self._save_work,
-            scale=0.075,
-            pos=core.Point3(-0.205, -0.385),
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text="Save Work",
+                command=self._save_work,
+                scale=0.075,
+                pos=core.Point3(-0.205, -0.385),
+            )
+        )
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text="Change to Wall",
+                command=self._change_frame_to_wall,
+                scale=0.075,
+                pos=core.Point3(-0.272, -0.478),
+            )
+        )
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text="Change to Door",
+                command=self._change_frame_to_door,
+                scale=0.075,
+                pos=core.Point3(-0.288, -0.588),
+            )
         )
 
         self._load_work()
+
+    def _change_frame_to_wall(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        frame_to_change.update(
+            frame_to_change.stud_width,
+            frame_to_change.stud_height,
+            frame_to_change.length,
+            frame_to_change.height,
+            wall_frame.Display,
+        )
+
+    def _change_frame_to_door(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        frame_to_change.update(
+            frame_to_change.stud_width,
+            frame_to_change.stud_height,
+            frame_to_change.length,
+            frame_to_change.height,
+            door_frame.Display,
+        )
+
+    def _debug_gui(self, component: DirectGuiBase.DirectGuiWidget):
+        if self._debugging_gui:
+
+            def _print_debug(task):
+                print(f'{component["text"]} - {component.get_pos()}')
+                return task.again
+
+            task_id = str(uuid.uuid4())
+            self.task_mgr.do_method_later(0.5, _print_debug, task_id)
+
+        return component
 
     def _change_to_two_by_four(self):
         if self._highlighter.selected_frame is None:
@@ -154,6 +219,7 @@ class App(ShowBase):
             position = frame_to_save.get_position()
             rotation = frame_to_save.get_rotation()
             details = {
+                "frame_type": frame_to_save.display_klass.SERIALIZED_NAME,
                 "stud_width": frame_to_save.stud_width,
                 "stud_height": frame_to_save.stud_height,
                 "length": frame_to_save.length,

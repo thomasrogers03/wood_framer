@@ -6,6 +6,8 @@ from . import frame_display
 
 
 class Display(frame_display.FrameDisplay):
+    SERIALIZED_NAME = "wall_frame"
+
     _SPACE_BETWEEN_STUDS = 16
     _INCHES_TO_FEET = 12
 

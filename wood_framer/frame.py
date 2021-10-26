@@ -124,9 +124,10 @@ class Frame:
         self._stud_height = stud_height
         self._length = length
         self._height = height
+        self._display_klass = display_klass
 
         self._frame_boundry.set_scale(self._length, self._stud_height, self._height)
-        self._frame_display = display_klass.create(
+        self._frame_display = self._display_klass.create(
             self._display_parent,
             self._stud_width,
             self._stud_height,

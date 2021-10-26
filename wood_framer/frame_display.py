@@ -5,6 +5,8 @@ from panda3d import core
 
 
 class FrameDisplay(metaclass=abc.ABCMeta):
+    SERIALIZED_NAME = "undefined"
+    
     _display_parent: core.NodePath
 
     @staticmethod
@@ -17,7 +19,7 @@ class FrameDisplay(metaclass=abc.ABCMeta):
         make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
     ) -> "FrameDisplay":
         raise NotImplementedError()
-
+    
     def destroy(self) -> None:
         raise NotImplementedError()
 

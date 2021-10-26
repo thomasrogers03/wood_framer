@@ -1,4 +1,4 @@
-from . import app
+from .main import main
 
 if __name__ == "__main__":
-    app.App().run()
+    main(False)
