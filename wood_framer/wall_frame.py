@@ -2,7 +2,7 @@ import typing
 
 from panda3d import core
 
-from . import frame_display
+from . import frame_display, stud
 
 
 class Display(frame_display.FrameDisplay):
@@ -38,38 +38,17 @@ class Display(frame_display.FrameDisplay):
         top.set_z(height - half_stud_width)
         self._make_label(top, self._length_message(length))
 
-        wall_stud_length = height - 2 * stud_width
-
-        x = -half_stud_width
-        length_left = length
-
-        x += self._stud_width
-        length_left -= self._stud_width
-        left_stud = make_stud(
-            self._frame, self._stud_width, self._stud_height, wall_stud_length
+        stud.add_studs(
+            self._display_parent,
+            self._frame,
+            self._stud_width,
+            self._stud_height,
+            length,
+            height - 2 * self._stud_width,
+            self._SPACE_BETWEEN_STUDS,
+            self._stud_width,
+            make_stud,
         )
-        left_stud.set_z(self._stud_width)
-        left_stud.set_x(x)
-        self._make_label(left_stud, self._length_message(wall_stud_length))
-        x += self._SPACE_BETWEEN_STUDS
-
-        while length_left >= self._SPACE_BETWEEN_STUDS:
-            stud = make_stud(
-                self._frame, self._stud_width, self._stud_height, wall_stud_length
-            )
-            stud.set_z(self._stud_width)
-            stud.set_x(x)
-            self._make_label(stud, self._length_message(wall_stud_length))
-            x += self._SPACE_BETWEEN_STUDS
-            length_left -= self._SPACE_BETWEEN_STUDS
-
-        if length_left > 0:
-            right_stud = make_stud(
-                self._frame, self._stud_width, self._stud_height, wall_stud_length
-            )
-            right_stud.set_z(self._stud_width)
-            right_stud.set_x(length - half_stud_width)
-            self._make_label(right_stud, self._length_message(wall_stud_length))
 
     @staticmethod
     def create(
