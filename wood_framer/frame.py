@@ -25,6 +25,7 @@ class Frame:
         make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
         display_klass: typing.Type[frame_display.FrameDisplay],
     ):
+        self._world = world
         self._stud_width = stud_width
         self._stud_height = stud_height
         self._length = length
@@ -44,18 +45,18 @@ class Frame:
         self.set_rotation = self._display_parent.set_hpr
 
         frame_boundry_shape = bullet.BulletBoxShape(core.Vec3(0.5, 0.5, 0.5))
-        frame_boundry_node = bullet.BulletRigidBodyNode(f"frame-{frame_id}")
-        frame_boundry_node.add_shape(
+        self._frame_boundry_node = bullet.BulletRigidBodyNode(f"frame-{frame_id}")
+        self._frame_boundry_node.add_shape(
             frame_boundry_shape,
             core.TransformState.make_pos(core.Vec3(0.5, 0, 0.5)),
         )
-        frame_boundry_node.set_kinematic(True)
-        frame_boundry_node.set_mass(0)
-        frame_boundry_node.set_python_tag("frame", self)
+        self._frame_boundry_node.set_kinematic(True)
+        self._frame_boundry_node.set_mass(0)
+        self._frame_boundry_node.set_python_tag("frame", self)
 
-        world.attach(frame_boundry_node)
+        self._world.attach(self._frame_boundry_node)
         self._frame_boundry: core.NodePath = self._display_parent.attach_new_node(
-            frame_boundry_node
+            self._frame_boundry_node
         )
 
         self._frame_display: typing.Optional[frame_display.FrameDisplay] = None
@@ -135,3 +136,8 @@ class Frame:
             self._height,
             self._make_stud,
         )
+
+    def destroy(self):
+        self._world.remove(self._frame_boundry_node)
+        self._frame_display.destroy()
+        self._display_parent.remove_node()

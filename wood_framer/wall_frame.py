@@ -38,7 +38,7 @@ class Display(frame_display.FrameDisplay):
         top.set_z(height - half_stud_width)
         self._make_label(top, self._length_message(length))
 
-        wall_stud_length = height - 4
+        wall_stud_length = height - 2 * stud_width
 
         stud_count = int(length / self._SPACE_BETWEEN_STUDS)
         for stud_index in range(stud_count):

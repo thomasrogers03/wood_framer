@@ -81,6 +81,7 @@ class App(ShowBase):
         self.accept("shift-a", self._add_frame)
         self.accept("shift-d", self._copy_frame)
         self.accept("shift-s", self._save_work)
+        self.accept("delete", self._delete_frame)
 
         self._debug_gui(
             DirectGui.DirectButton(
@@ -147,6 +148,14 @@ class App(ShowBase):
         )
 
         self._load_work()
+
+    def _delete_frame(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        self._highlighter.clear()
+        frame_to_change.destroy()
 
     def _change_frame_to_wall(self):
         if self._highlighter.selected_frame is None:

@@ -55,6 +55,15 @@ class Highlighter(DirectObject):
                 self._highlighted_frame = highlighted_frame
                 self._highlighted_frame.set_highlight(frame.FrameHighlight.highlighted)
 
+    def clear(self):
+        if self._highlighted_frame is not None:
+            self._highlighted_frame.set_highlight(frame.FrameHighlight.none)
+            self._highlighted_frame = None
+
+        if self._selected_frame is not None:
+            self._selected_frame.set_highlight(frame.FrameHighlight.none)
+            self._selected_frame = None
+
     def get_mouse_position(self):
         if not self._mouse_watcher.has_mouse():
             return core.Point2()

@@ -9,6 +9,8 @@ class FrameDisplay(metaclass=abc.ABCMeta):
     _INCHES_TO_FEET = 12
 
     _display_parent: core.NodePath
+    _stud_width: float
+    _stud_height: float
 
     @staticmethod
     def create(
