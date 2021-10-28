@@ -30,11 +30,6 @@ class Display(frame_display.FrameDisplay):
 
         half_stud_width = self._stud_width / 2
 
-        top = make_stud(self._frame, self._stud_width, stud_height, length)
-        top.set_r(90)
-        top.set_z(height - half_stud_width)
-        self._make_label(top, self._length_message(length))
-
         frame_stud_length = min(self._SEVEN_FEET, height - half_stud_width)
 
         support_top = make_stud(self._frame, self._stud_width, stud_height, length)
