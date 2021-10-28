@@ -34,7 +34,7 @@ class Display(frame_display.FrameDisplay):
             length,
             height,
             self._SPACE_BETWEEN_STUDS,
-            self._stud_width,
+            0,
             make_stud,
         )
 
