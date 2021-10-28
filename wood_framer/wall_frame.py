@@ -2,10 +2,10 @@ import typing
 
 from panda3d import core
 
-from . import frame_display, stud
+from . import frame_display, stud, top_and_bottom_frame
 
 
-class Display(frame_display.FrameDisplay):
+class Display(top_and_bottom_frame.Display):
     SERIALIZED_NAME = "wall_frame"
 
     _SPACE_BETWEEN_STUDS = 16
@@ -19,24 +19,9 @@ class Display(frame_display.FrameDisplay):
         height: float,
         make_stud: typing.Callable[[core.NodePath, float, float, float], core.NodePath],
     ):
-        self._display_parent = display_parent
-
-        self._frame: core.NodePath = self._display_parent.attach_new_node("frame")
-
-        self._stud_width = stud_width
-        self._stud_height = stud_height
-
-        half_stud_width = self._stud_width / 2
-
-        bottom = make_stud(self._frame, self._stud_width, stud_height, length)
-        bottom.set_r(90)
-        bottom.set_z(half_stud_width)
-        self._make_label(bottom, self._length_message(length))
-
-        top = make_stud(self._frame, self._stud_width, stud_height, length)
-        top.set_r(90)
-        top.set_z(height - half_stud_width)
-        self._make_label(top, self._length_message(length))
+        super().__init__(
+            display_parent, stud_width, stud_height, length, height, make_stud
+        )
 
         stud.add_studs(
             self._display_parent,
