@@ -2,6 +2,7 @@ import json
 import os.path
 import typing
 import uuid
+from collections import defaultdict
 
 from direct.gui import DirectGui, DirectGuiBase
 from direct.showbase.ShowBase import ShowBase
@@ -14,6 +15,7 @@ from . import (
     frame_modifier,
     highlighter,
     roof_frame,
+    stud,
     wall_frame,
     wall_frame_with_plywood,
 )
@@ -165,8 +167,32 @@ class App(ShowBase):
                 pos=core.Point3(-0.498, -0.925),
             )
         )
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
+                text="Save materials.txt",
+                command=self._dump_materials,
+                scale=0.075,
+                pos=core.Point3(-0.328, -1.0385),
+            )
+        )
 
         self._load_work()
+
+    def _dump_materials(self):
+        all_studs: typing.List[core.NodePath] = self._scene.find_all_matches(
+            "**/stud-*"
+        )
+        lumber: typing.Dict[str, float] = defaultdict(lambda: 0.0)
+        for stud_node_path in all_studs:
+            display: core.NodePath = stud_node_path.find("display")
+            lumber_type = f'{display.get_sx()}"x{display.get_sy()}"'
+            length: float = stud_node_path.get_sz()
+            lumber[lumber_type] += length
+
+        with open("materials.txt", "w+") as file:
+            for lumber_type, length in lumber.items():
+                file.write(f"{lumber_type}: {stud.inches_to_nice_length(length)}\n")
 
     def _delete_frame(self):
         if self._highlighter.selected_frame is None:

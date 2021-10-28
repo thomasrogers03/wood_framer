@@ -57,11 +57,15 @@ def add_studs(
 
 
 def length_message(stud_width: float, stud_height: float, inches: float):
+    return f'{stud_width}"x{stud_height}"x{inches_to_nice_length(inches)}'
+
+
+def inches_to_nice_length(inches: float):
     feet = 0
     while inches >= INCHES_TO_FEET:
         feet += 1
         inches -= INCHES_TO_FEET
-    message = f'{stud_width}"x{stud_height}"x'
+    message = ""
     if feet > 0:
         message += f"{feet}'"
     if inches > 0:
