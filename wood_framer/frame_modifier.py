@@ -23,6 +23,7 @@ class FrameModifier(DirectObject):
         self._highligher = frame_highligher
         self._enable_mouse = enable_mouse
         self._disable_mouse = disable_mouse
+        self._grid_size = 0.5
 
         self._transforming = False
         self._start_position = core.Point3()
@@ -54,7 +55,21 @@ class FrameModifier(DirectObject):
         self.accept("arrow_down", self._decrease_pitch)
         self.accept("arrow_down-repeat", self._decrease_pitch)
         self.accept("arrow_up", self._increase_pitch)
-        self.accept("arrow_up-repeat", self._increase_pitch)
+
+        self.accept("[", self._decrease_grid)
+        self.accept("[-repeat", self._decrease_grid)
+        self.accept("]", self._increase_grid)
+        self.accept("]-repeat", self._increase_grid)
+
+    def _decrease_grid(self):
+        self._grid_size /= 2
+        if self._grid_size < 0.25:
+            self._grid_size = 0.25
+
+    def _increase_grid(self):
+        self._grid_size *= 2
+        if self._grid_size > 512:
+            self._grid_size = 512
 
     def _decrease_pitch(self):
         self._change_pitch(-15)
@@ -166,7 +181,7 @@ class FrameModifier(DirectObject):
             [transform_vector.x, transform_vector.y, transform_vector.z],
             key=lambda component: math.fabs(component),
         )
-        snapped_max_component = round(max_component * 2) / 2
+        snapped_max_component = round(max_component / self._grid_size) * self._grid_size
 
         if max_component == transform_vector.x:
             transform_direction = core.Vec3(snapped_max_component, 0, 0)

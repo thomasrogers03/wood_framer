@@ -37,7 +37,7 @@ class Display(frame_display.FrameDisplay):
         support_top.set_z(frame_stud_length + half_stud_width)
         self._make_label(support_top, self._length_message(length))
 
-        support_length = height - frame_stud_length - 2 * self._stud_width
+        support_length = height - frame_stud_length - self._stud_width
         support_centre = make_stud(
             self._frame, self._stud_width, stud_height, support_length
         )
