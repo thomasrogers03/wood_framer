@@ -114,10 +114,19 @@ class App(ShowBase):
         self._debug_gui(
             DirectGui.DirectButton(
                 parent=self.a2dTopRight,
+                text='Change to 6"x6"',
+                command=self._change_to_six_by_six,
+                scale=0.075,
+                pos=core.Point3(-0.282, -0.385),
+            )
+        )
+        self._debug_gui(
+            DirectGui.DirectButton(
+                parent=self.a2dTopRight,
                 text="Save Work",
                 command=self._save_work,
                 scale=0.075,
-                pos=core.Point3(-0.205, -0.385),
+                pos=core.Point3(-0.205, -0.495),
             )
         )
         self._debug_gui(
@@ -126,7 +135,7 @@ class App(ShowBase):
                 text="Change to Wall",
                 command=self._change_frame_to_wall,
                 scale=0.075,
-                pos=core.Point3(-0.272, -0.478),
+                pos=core.Point3(-0.272, -0.588),
             )
         )
         self._debug_gui(
@@ -135,7 +144,7 @@ class App(ShowBase):
                 text="Change to Door",
                 command=self._change_frame_to_door,
                 scale=0.075,
-                pos=core.Point3(-0.288, -0.588),
+                pos=core.Point3(-0.288, -0.698),
             )
         )
         self._debug_gui(
@@ -144,7 +153,7 @@ class App(ShowBase):
                 text="Change to Roof",
                 command=self._change_frame_to_roof,
                 scale=0.075,
-                pos=core.Point3(-0.288, -0.698),
+                pos=core.Point3(-0.288, -0.812),
             )
         )
         self._debug_gui(
@@ -153,7 +162,7 @@ class App(ShowBase):
                 text="Change to Wall w/ Ply Wood",
                 command=self._change_frame_to_wall_with_ply_wood,
                 scale=0.075,
-                pos=core.Point3(-0.498, -0.812),
+                pos=core.Point3(-0.498, -0.925),
             )
         )
 
@@ -251,6 +260,19 @@ class App(ShowBase):
         frame_to_change = self._highlighter.selected_frame
         frame_to_change.update(
             2,
+            6,
+            frame_to_change.length,
+            frame_to_change.height,
+            frame_to_change.display_klass,
+        )
+
+    def _change_to_six_by_six(self):
+        if self._highlighter.selected_frame is None:
+            return
+
+        frame_to_change = self._highlighter.selected_frame
+        frame_to_change.update(
+            6,
             6,
             frame_to_change.length,
             frame_to_change.height,
