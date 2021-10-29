@@ -10,7 +10,7 @@ class Display(frame_display.FrameDisplay):
 
     _SPACE_BETWEEN_STUDS = 16
     _INCHES_TO_FEET = 12
-    _SEVEN_FEET = 7 * _INCHES_TO_FEET
+    _SIX_FEET = 6 * _INCHES_TO_FEET
 
     def __init__(
         self,
@@ -30,7 +30,7 @@ class Display(frame_display.FrameDisplay):
 
         half_stud_width = self._stud_width / 2
 
-        frame_stud_length = min(self._SEVEN_FEET, height - half_stud_width)
+        frame_stud_length = min(self._SIX_FEET, height - half_stud_width)
 
         support_top = make_stud(self._frame, self._stud_width, stud_height, length)
         support_top.set_r(90)
