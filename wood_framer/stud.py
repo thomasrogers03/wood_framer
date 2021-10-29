@@ -87,5 +87,6 @@ def make_label(display_parent: core.NodePath, parent: core.NodePath, text: str):
     result.set_scale(display_parent, core.Vec3(1, 1, 1))
     result.set_two_sided(True)
     result.set_light_off(1)
+    result.set_depth_offset(100, 1)
 
     return result
