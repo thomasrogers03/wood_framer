@@ -180,19 +180,38 @@ class App(ShowBase):
         self._load_work()
 
     def _dump_materials(self):
-        all_studs: typing.List[core.NodePath] = self._scene.find_all_matches(
-            "**/stud-*"
+        all_lumber: typing.List[typing.Dict[str, float]] = []
+        all_frames: typing.List[core.NodePath] = self._scene.find_all_matches(
+            "**/frame-*"
         )
-        lumber: typing.Dict[str, float] = defaultdict(lambda: 0.0)
-        for stud_node_path in all_studs:
-            display: core.NodePath = stud_node_path.find("display")
-            lumber_type = f'{display.get_sx()}"x{display.get_sy()}"'
-            length: float = stud_node_path.get_sz()
-            lumber[lumber_type] += length
+        for frame_to_calculate in all_frames:
+            lumber: typing.Dict[str, float] = defaultdict(lambda: 0.0)
+            all_studs: typing.List[core.NodePath] = frame_to_calculate.find_all_matches(
+                "**/stud-*"
+            )
+            for stud_node_path in all_studs:
+                display: core.NodePath = stud_node_path.find("display")
+                lumber_type = f'{display.get_sx()}"x{display.get_sy()}"'
+                length: float = stud_node_path.get_sz()
+                lumber[lumber_type] += length
+
+            all_lumber.append(lumber)
+
+        total_lumber: typing.Dict[str, float] = defaultdict(lambda: 0.0)
+        for lumber in all_lumber:
+            for lumber_type, length in lumber.items():
+                total_lumber[lumber_type] += length
 
         with open("materials.txt", "w+") as file:
-            for lumber_type, length in lumber.items():
-                file.write(f"{lumber_type}: {stud.inches_to_nice_length(length)}\n")
+            file.write("Total:\n")
+            for lumber_type, length in total_lumber.items():
+                file.write(f"\t{lumber_type}: {stud.inches_to_nice_length(length)}\n")
+            for index, lumber in enumerate(all_lumber):
+                file.write(f"Frame {index}:\n")
+                for lumber_type, length in lumber.items():
+                    file.write(
+                        f"\t{lumber_type}: {stud.inches_to_nice_length(length)}\n"
+                    )
 
     def _delete_frame(self):
         if self._highlighter.selected_frame is None:
