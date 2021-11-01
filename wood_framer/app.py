@@ -187,7 +187,6 @@ class App(ShowBase):
                 "**/frame-*"
             )
             for index, frame_to_calculate in enumerate(all_frames):
-                file.write(f"Frame {index}:\n")
 
                 cuts: typing.List[typing.Tuple(str, float)] = []
                 lumber: typing.Dict[str, float] = defaultdict(lambda: 0.0)
@@ -202,17 +201,19 @@ class App(ShowBase):
                     total_lumber[lumber_type] += length
                     cuts.append((lumber_type, length))
 
-                file.write("\tLumber:\n")
-                for lumber_type, length in lumber.items():
-                    file.write(
-                        f"\t\t{lumber_type}: {stud.inches_to_nice_length(length)}\n"
-                    )
+                if len(lumber) > 0:
+                    file.write(f"Frame {index}:\n")
+                    file.write("\tLumber:\n")
+                    for lumber_type, length in lumber.items():
+                        file.write(
+                            f"\t\t{lumber_type}: {stud.inches_to_nice_length(length)}\n"
+                        )
 
-                file.write("\tCuts:\n")
-                for lumber_type, length in cuts:
-                    file.write(
-                        f"\t\t{lumber_type}: {stud.inches_to_nice_length(length)}\n"
-                    )
+                    file.write("\tCuts:\n")
+                    for lumber_type, length in cuts:
+                        file.write(
+                            f"\t\t{lumber_type}: {stud.inches_to_nice_length(length)}\n"
+                        )
 
             file.write("Total:\n")
             for lumber_type, length in total_lumber.items():
