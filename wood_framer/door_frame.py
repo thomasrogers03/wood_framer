@@ -30,20 +30,22 @@ class Display(frame_display.FrameDisplay):
 
         half_stud_width = self._stud_width / 2
 
-        frame_stud_length = min(self._SIX_FEET, height - half_stud_width)
+        frame_stud_length = min(self._SIX_FEET, height - half_stud_width) + self._stud_width
 
-        support_top = make_stud(self._frame, self._stud_width, stud_height, length)
+        support_top = make_stud(self._frame, self._stud_width, stud_height, length - 2 * stud_width)
         support_top.set_r(90)
-        support_top.set_z(frame_stud_length + half_stud_width)
+        support_top.set_x(stud_width)
+        support_top.set_z(frame_stud_length + half_stud_width - self._stud_width)
         self._make_label(support_top, self._length_message(length))
 
-        support_length = height - frame_stud_length - self._stud_width
-        support_centre = make_stud(
-            self._frame, self._stud_width, stud_height, support_length
-        )
-        support_centre.set_z(frame_stud_length + self._stud_width)
-        support_centre.set_x(length / 2)
-        self._make_label(support_centre, self._length_message(support_length))
+        support_length = height - frame_stud_length - 2 * self._stud_width
+        if support_length > 0:
+            support_centre = make_stud(
+                self._frame, self._stud_width, stud_height, support_length
+            )
+            support_centre.set_z(frame_stud_length + self._stud_width)
+            support_centre.set_x(length / 2)
+            self._make_label(support_centre, self._length_message(support_length))
 
         left_stud = make_stud(
             self._frame, self._stud_width, self._stud_height, frame_stud_length

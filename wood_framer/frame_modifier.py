@@ -41,6 +41,8 @@ class FrameModifier(DirectObject):
         self.accept("shift---repeat", self._decrease_height)
         self.accept("shift-+", self._increase_height)
         self.accept("shift-+-repeat", self._increase_height)
+        self.accept("shift-=", self._increase_height)
+        self.accept("shift-=-repeat", self._increase_height)
 
         self.accept("shift-arrow_left", self._decrease_roll)
         self.accept("shift-arrow_left-repeat", self._decrease_roll)
@@ -72,10 +74,10 @@ class FrameModifier(DirectObject):
             self._grid_size = 512
 
     def _decrease_pitch(self):
-        self._change_pitch(-15)
+        self._change_pitch(-5)
 
     def _increase_pitch(self):
-        self._change_pitch(15)
+        self._change_pitch(5)
 
     def _change_pitch(self, amount: float):
         if self._highligher.selected_frame is None:
